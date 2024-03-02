@@ -1,0 +1,16 @@
+body{
+    background-color: lightslategrey;
+}
+
+#nav_bar{
+    background-color: blueviolet;
+}
+
+.main{
+    font-family: 'Times New Roman', Times, serif;
+
+}
+
+h1{
+    color: yellow;
+}
