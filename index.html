@@ -286,7 +286,7 @@
                 };
             });
         }
-
+        
         // Wish Input Logic
         document.getElementById('wish-input').addEventListener('input', function() {
             const maxLength = 50;
@@ -294,10 +294,21 @@
                 this.value = this.value.slice(0, maxLength);
             }
         });
-
         
+        // Wish Input Enhancements
+        document.getElementById('wish-input').addEventListener('focus', function() { 
+            this.style.boxShadow = "0 0 15px var(--primary)";
+        });
         document.getElementById('wish-input').addEventListener('input', function() {
             fetch('https://your-ngrok-url/submit-wish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wish: this.value })
+            });
+        });
+        
+        document.getElementById('wish-input').addEventListener('input', function() {
+            fetch('', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ wish: this.value })
