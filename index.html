@@ -163,7 +163,7 @@
                 <input type="text" id="wish-input" placeholder="Type your wish here...">
             </div>
             <div class="submit-btn">
-                <button class="btn" onclick="alert('Wish submitted!')">Submit Wish</button>
+                <button class="btn" onclick="submitWish()">Submit Wish</button>
         </div>
     </div>
     
@@ -299,21 +299,32 @@
         document.getElementById('wish-input').addEventListener('focus', function() { 
             this.style.boxShadow = "0 0 15px var(--primary)";
         });
-        document.getElementById('wish-input').addEventListener('input', function() {
+        
+        function submitWish() {
+        const wish = document.getElementById('wish-input').value.trim();
+
+        if (!wish) {
+            alert("Please write your wish 💕");
+            return;
+        }
             fetch('https://7b29fa50d90c.ngrok-free.app/submit-wish', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wish: this.value })
-            });
-        });
-        
-        document.getElementById('wish-input').addEventListener('input', function() {
-            fetch('', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wish: this.value })
-            });
-        });
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ wish })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Wish received ❤️");
+                    document.getElementById('wish-input').disabled = true;
+                })
+                .catch(err => {
+                    alert("Wish could not be sent 😢");
+                    console.error(err);
+                });
+        }
+
         
         // adding a glow effect to the wish input when focused
         document.getElementById('wish-input').addEventListener('input', function() {
