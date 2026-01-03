@@ -3,14 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>document</title>
-    <link rel="stylesheet"  href="/css/styles.css">
+    <title>For My Love ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root { --primary: #ff4d6d; --bg: #0b0e14; }
+        * { box-sizing: border-box; transition: all 0.8s ease-in-out; }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Montserrat', sans-serif; background: var(--bg);
+            color: white; overflow-x: hidden; scroll-behavior: smooth;
+        }
+
+        /* Visibility Classes */
+        .section { 
+            min-height: 100vh; width: 100%; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; transform: translateY(20px); pointer-events: none;
+            position: absolute; top: 0; left: 0;
+        }
+        .section.active { 
+            opacity: 1; transform: translateY(0); 
+            pointer-events: auto; position: relative; 
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            padding: 40px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center; width: 90%; max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Start Button Overlay */
+        #overlay {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .btn {
+            padding: 15px 40px; border: none; background: var(--primary);
+            color: white; border-radius: 50px; font-size: 1.2rem;
+            cursor: pointer; box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* Timer Styles */
+        #timer { display: flex; justify-content: space-around; margin: 30px 0; }
+        .t-box span { font-size: 2.5rem; color: var(--primary); font-weight: bold; display: block; }
+
+        /* Wish Animation */
+        #wish-text { 
+            font-family: 'Dancing Script', cursive; font-size: 2.5rem; 
+            color: var(--primary); min-height: 100px; margin: 20px 0;
+        }
+
+        /* Cake & Flame */
+        .cake { position: relative; width: 150px; height: 100px; margin: 40px auto;  border-radius: 10px; }
+
+        .candle { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 10px; height: 40px; background: white; }
+        .flame { 
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 15px; height: 25px; background: #ff9800; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 15px #ff9800;
+        }
+        .layer {
+            border-radius: 10px;
+            height: 40px;
+            &.one {
+                width: 50px;
+                transform: translateX(50px);
+                background: radial-gradient(circle, white 7px, skyblue 7px), skyblue;
+                background-size: 10px 40px;
+            }
+            &.two {
+                width: 100px;
+                background: radial-gradient(circle, white 10px, pink 10px), pink;
+                background-size: 10px 40px;
+                background-position-x: 10px;
+                transform: translateX(25px);
+             }
+            &.three {
+                width: 150px;
+                background: radial-gradient(circle, white 10px, chocolate 10px), chocolate;
+                background-size: 10px 40px;
+             }
+         }
+        .cake-decor {
+            position: absolute; bottom: 20px; width: 100%; height: 40px;
+            background: radial-gradient(circle, white 10px, chocolate 10px), chocolate;
+            background-size: 10px 40px;
+        }
+        .flicker { animation: flickerAnim 1s infinite; }
+        .flame.out { opacity: 0; transform: scale(0); }
+        .cake-base { position: absolute; bottom: 0; width: 100%; height: 60px; background: #ee9ce0; border-radius: 0 0 10px 10px; }
+
+        /* Wish Input */
+        .wish-Box { margin: 20px 0; }
+        #wish-input {
+            padding: 10px 15px; border-radius: 30px; border: none; width: 80%;
+            font-size: 1rem; outline: none;
+        }
+        .submit-btn { margin-top: 10px; }
+        
+
+        /* Scratch Card */
+        .scratch-container { position: relative; width: 280px; height: 280px; margin: 20px auto; border-radius: 15px; overflow: hidden; }
+        #scratch-canvas { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; }
+        #revealed-photo { width: 100%; height: 100%; object-fit: cover; }
+    </style>
 </head>
 <body>
-    <div id="nav_bar">
-        <h1 class="main">Para 1</h1>
+
+    <audio id="bg-music" loop >
+        <!--<source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+    -->
+        <source src="song.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="overlay">
+        <button class="btn" onclick="startExperience()">Unlock My Heart ❤️</button>
     </div>
-    <h1>Hello there still constructing</h1>
+
+    <div id="sec-timer" class="section active">
+        <div class="glass-card">
+            <h2>Counting the seconds until...</h2>
+            <div id="timer">
+                <div class="t-box"><span id="days">00</span><p>Days</p></div>
+                <div class="t-box"><span id="hours">00</span><p>Hours</p></div>
+                <div class="t-box"><span id="mins">00</span><p>Mins</p></div>
+                <div class="t-box"><span id="secs">00</span><p>Secs</p></div>
+            </div>
+            <p>I love you every second of it.</p>
+        </div>
+    </div>
+
+    <div id="sec-wish" class="section">
+        <div class="glass-card">
+            <h1 style="font-family: 'Dancing Script';">Happy Birthday!</h1>
+            <div id="wish">
+                <h2 style="font-family: 'Dancing Script'; font-size: 2rem; color: var(--primary);">Wishing you all the love and happiness in the world! ❤️</h2>
+
+            </div>
+            <p>Scroll down for your cake! ↓</p>
+        </div>
+    </div>
+
+    <div id="sec-cake" class="section">
+        <div class="glass-card">
+            <h3>Make a wish and blow! 🎂</h3>
+            <br>
+            <div class="cake">
+                <div class="candle"><div id="flame" class="flame flicker"></div></div>
+                <div class="layer one"></div>
+                <div class="layer two"></div>
+                <div class="layer three"></div>
+            </div>
+            <p id="mic-status">Waiting for your breath...</p>
+            <div class="wish-Box">
+                <input type="text" id="wish-input" placeholder="Type your wish here...">
+            </div>
+            <div class="submit-btn">
+                <button class="btn" onclick="alert('Wish submitted!')">Submit Wish</button>
+        </div>
+    </div>
     
+
+    <div id="sec-scratch" class="section">
+        <div class="glass-card">
+            <h3>A Hidden Memory 💕</h3>
+            <div class="scratch-container">
+                <img src="main.jpeg" id="revealed-photo">
+                <canvas id="scratch-canvas"></canvas>
+            </div>
+            <p>Scratch to reveal my favorite photo.❤️</p>
+            <div id="wish-text">Loading my love...</div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION: Set your date here!
+        const YEAR = 2026;
+        const MONTH = 1; // 4th Month: April
+        const DAY = 3; //29
+        const TARGET_DATE = new Date(YEAR, MONTH - 1, DAY, 0, 0, 0).getTime(); //0,0,0).getTime();
+
+        const wishes = [
+            "To the most beautiful girl in Badulla...😍",
+            "You are the light of my life.💕",
+            "I am so proud to be yours.💖",
+            "May your 2026 be as bright as your smile!🥰",
+            "I love you more than words can say.😘",
+            "You are the most amazing person I know.😉",
+            "i want to grow old with you.💞",
+            "I wish you all the happiness in the world.🌏",
+            "You make my life complete.💖",
+            "You are the most beautiful girl I know.👸",
+            "I choose you, always 💍"
+        ];
+
+        function startExperience() {
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('overlay').style.display = 'none', 800);
+            document.getElementById('bg-music').play();
+            
+            initTimer();
+            initScratch();
+            initMic();
+        }
+
+        // 1. Timer Logic
+        function initTimer() {
+            const timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = TARGET_DATE - now;
+
+                if (diff <= 0) {
+                    clearInterval(timerInterval);
+                    activateBirthdayMode();
+                    return;
+                }
+
+                document.getElementById('days').innerText = Math.floor(diff / (86400000)).toString().padStart(2, '0');
+                document.getElementById('hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                document.getElementById('mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                document.getElementById('secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        function activateBirthdayMode() {
+            // Hide timer, show all others
+            document.getElementById('sec-timer').classList.remove('active');
+            document.getElementById('sec-wish').classList.add('active');
+            document.getElementById('sec-cake').classList.add('active');
+            document.getElementById('sec-scratch').classList.add('active');
+            document.body.style.overflowY = "auto";
+            
+            // Start Pop-up Wishes
+            let i = 0;
+            setInterval(() => {
+                const wishBox = document.getElementById('wish-text');
+                wishBox.style.opacity = 0;
+                setTimeout(() => {
+                    wishBox.innerText = wishes[i];
+                    wishBox.style.opacity = 1;
+                    i = (i + 1) % wishes.length;
+                }, 800);
+            }, 4000);
+
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // 2. Microphone Logic (Improved)
+        function initMic() {
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                document.getElementById('mic-status').innerText = "Mic Ready! Blow! 🌬️";
+
+                function checkBlow() {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+                    let average = sum / dataArray.length;
+
+                    if (average > 40) { // Sensitive threshold
+                        document.getElementById('flame').classList.add('out');
+                        document.getElementById('mic-status').innerText = "Wish made! ✨";
+                        confetti({ particleCount: 50 });
+                    }
+                    requestAnimationFrame(checkBlow);
+                }
+                checkBlow();
+            }).catch(() => {
+                document.getElementById('mic-status').innerText = "Mic blocked. Tap flame to blow!";
+                document.getElementById('flame').onclick = () => {
+                    document.getElementById('flame').classList.add('out');
+                    confetti({ particleCount: 100 });
+                };
+            });
+        }
+
+        // Wish Input Logic
+        document.getElementById('wish-input').addEventListener('input', function() {
+            const maxLength = 50;
+            if (this.value.length > maxLength) {
+                this.value = this.value.slice(0, maxLength);
+            }
+        });
+
+        
+        document.getElementById('wish-input').addEventListener('input', function() {
+            fetch('https://your-ngrok-url/submit-wish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wish: this.value })
+            });
+        });
+        
+        // adding a glow effect to the wish input when focused
+        document.getElementById('wish-input').addEventListener('input', function() {
+            this.style.boxShadow = "0 0 10px var(--primary)";
+        });
+        document.getElementById('wish-input').addEventListener('blur', function() {
+            this.style.boxShadow = "none";
+        });
+
+        // making the wish input more interactive
+        document.getElementById('wish-input').addEventListener('focus', function() {
+            this.style.boxShadow = "0 0 10px var(--primary)";
+        });
+
+        // 3. Scratch Logic
+        function initScratch() {
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 280; canvas.height = 280;
+            ctx.fillStyle = '#777'; ctx.fillRect(0,0,280,280);
+            ctx.fillStyle = "white"; ctx.font = "18px Montserrat"; ctx.textAlign = "center";
+            ctx.fillText("Scratch with love", 140, 140);
+
+            let mousedown = false;
+            function scratch(e) {
+                if(!mousedown) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.pageX || e.touches[0].pageX) - rect.left - window.scrollX;
+                const y = (e.pageY || e.touches[0].pageY) - rect.top - window.scrollY;
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI*2); ctx.fill();
+            }
+            canvas.onmousedown = canvas.ontouchstart = () => mousedown = true;
+            window.onmouseup = window.ontouchend = () => mousedown = false;
+            canvas.onmousemove = canvas.ontouchmove = scratch;
+        }
+    </script>
 </body>
 </html>
