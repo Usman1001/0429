@@ -183,8 +183,8 @@
     <script>
         // CONFIGURATION: Set your date here!
         const YEAR = 2026;
-        const MONTH = 1; // 4th Month: April
-        const DAY = 3; //29
+        const MONTH = 4; // 4th Month: April
+        const DAY = 29; //29
         const TARGET_DATE = new Date(YEAR, MONTH - 1, DAY, 0, 0, 0).getTime(); //0,0,0).getTime();
 
         const wishes = [
@@ -317,7 +317,6 @@
                 .then(res => res.json())
                 .then(data => {
                     alert("Wish received ❤️");
-                    document.getElementById('wish-input').disabled = true;
                 })
                 .catch(err => {
                     alert("Wish could not be sent 😢");
