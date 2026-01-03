@@ -300,7 +300,7 @@
             this.style.boxShadow = "0 0 15px var(--primary)";
         });
         document.getElementById('wish-input').addEventListener('input', function() {
-            fetch('https://7b29fa50d90c.ngrok-free.app/server.js', {
+            fetch('https://7b29fa50d90c.ngrok-free.app/submit-wish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ wish: this.value })
